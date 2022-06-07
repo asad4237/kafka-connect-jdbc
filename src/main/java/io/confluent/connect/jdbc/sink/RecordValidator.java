@@ -79,7 +79,7 @@ public interface RecordValidator {
       Schema valueSchema = record.valueSchema();
       if (record.value() != null
           && valueSchema != null
-          && valueSchema.type() == Schema.Type.STRUCT) {
+          && valueSchema.type() == Schema.Type.STRUCT || config.customJsonEnabled()) {
         return;
       }
       throw new ConnectException(

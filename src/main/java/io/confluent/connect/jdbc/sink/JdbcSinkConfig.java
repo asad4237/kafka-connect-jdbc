@@ -41,7 +41,11 @@ import io.confluent.connect.jdbc.util.TimeZoneValidator;
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.common.config.ConfigException;
+import org.apache.kafka.common.config.ConfigDef.Importance;
+import org.apache.kafka.common.config.ConfigDef.Width;
+import org.apache.kafka.common.config.ConfigDef.Type;
 import org.apache.kafka.common.config.types.Password;
+import org.apache.kafka.connect.json.JsonConverterConfig;
 
 public class JdbcSinkConfig extends AbstractConfig {
 
@@ -66,6 +70,19 @@ public class JdbcSinkConfig extends AbstractConfig {
           "__connect_offset"
       )
   );
+
+  
+  public static final String CUSTOM_JSON = JdbcSourceConnectorConfig.CUSTOM_JSON_CONFIG;
+  private static final String CUSTOM_JSON_DEFAULT = "false";
+  private static final String CUSTOM_JSON_DOC = "Custom JSON paring enabled?";
+  private static final String CUSTOM_JSON_DISPLAY = "Custom JSON paring enabled?";
+
+  public static final String CUSTOM_JSON_SCHEMA = JdbcSourceConnectorConfig.CUSTOM_JSON_SCHEMA_CONFIG;
+  private static final String CUSTOM_JSON_SCHEMA_DEFAULT  = "";
+  private static final String CUSTOM_JSON_SCHEMA_DOC = "Custom schema string";
+  private static final String CUSTOM_JSON_SCHEMA_DISPLAY = "Custom schema";
+  
+
 
   public static final String CONNECTION_URL = JdbcSourceConnectorConfig.CONNECTION_URL_CONFIG;
   private static final String CONNECTION_URL_DOC =
@@ -261,7 +278,29 @@ public class JdbcSinkConfig extends AbstractConfig {
       EnumRecommender.in(TableType.values());
 
   public static final ConfigDef CONFIG_DEF = new ConfigDef()
-        // Connection
+  //Custom Json Schema
+  .define(
+            CUSTOM_JSON,
+            ConfigDef.Type.BOOLEAN,
+            CUSTOM_JSON_DEFAULT,
+            ConfigDef.Importance.MEDIUM,
+            CUSTOM_JSON_DOC, DATAMAPPING_GROUP,
+            6,
+            ConfigDef.Width.SHORT,
+            CUSTOM_JSON_DISPLAY
+        )   
+//Custom Json Schema
+  .define(
+    CUSTOM_JSON_SCHEMA,
+    ConfigDef.Type.STRING,
+    CUSTOM_JSON_SCHEMA_DEFAULT,
+    ConfigDef.Importance.MEDIUM,
+    CUSTOM_JSON_SCHEMA_DOC, DATAMAPPING_GROUP,
+    6,
+    ConfigDef.Width.LONG,
+    CUSTOM_JSON_SCHEMA_DISPLAY
+)   
+  // Connection
         .define(
             CONNECTION_URL,
             ConfigDef.Type.STRING,
@@ -514,9 +553,21 @@ public class JdbcSinkConfig extends AbstractConfig {
   public final TimeZone timeZone;
   public final EnumSet<TableType> tableTypes;
 
+
+    public final boolean customJsonEnabled;
+    public final String customJSONSchema;
+    public final boolean schemasEnabled;
+
   public JdbcSinkConfig(Map<?, ?> props) {
     super(CONFIG_DEF, props);
+
+    CONFIG_DEF.define(JsonConverterConfig.SCHEMAS_ENABLE_CONFIG, Type.BOOLEAN, JsonConverterConfig.SCHEMAS_ENABLE_DEFAULT , Importance.HIGH, "Include schemas within each of the serialized values and keys.", "Enable Schemas",
+    0, Width.MEDIUM, "Enable Schemas");
+    
+    this.schemasEnabled = getBoolean(JsonConverterConfig.SCHEMAS_ENABLE_CONFIG);
     connectorName = ConfigUtils.connectorName(props);
+    customJsonEnabled = getBoolean(CUSTOM_JSON);
+    customJSONSchema = getString(CUSTOM_JSON_SCHEMA);
     connectionUrl = getString(CONNECTION_URL);
     connectionUser = getString(CONNECTION_USER);
     connectionPassword = getPasswordValue(CONNECTION_PASSWORD);
@@ -555,7 +606,13 @@ public class JdbcSinkConfig extends AbstractConfig {
   public String connectorName() {
     return connectorName;
   }
-
+  public boolean customJsonEnabled() {
+    return customJsonEnabled;
+  }
+  public String customJSONSchema() {
+    return customJSONSchema;
+  }
+  
   public EnumSet<TableType> tableTypes() {
     return tableTypes;
   }

@@ -61,6 +61,11 @@ public class JdbcSourceConnectorConfig extends AbstractConfig {
   private static final Logger LOG = LoggerFactory.getLogger(JdbcSourceConnectorConfig.class);
   private static Pattern INVALID_CHARS = Pattern.compile("[^a-zA-Z0-9._-]");
 
+  public static final String CUSTOM_PREFIX = "custom.";
+  public static final String CUSTOM_JSON_CONFIG = CUSTOM_PREFIX + "json.schema.enabled";
+  public static final String CUSTOM_JSON_SCHEMA_CONFIG = CUSTOM_PREFIX + "json.schema";
+  
+
   public static final String CONNECTION_PREFIX = "connection.";
 
   public static final String CONNECTION_URL_CONFIG = CONNECTION_PREFIX + "url";
