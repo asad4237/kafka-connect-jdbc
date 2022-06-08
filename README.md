@@ -5,6 +5,21 @@ for loading data to and from any JDBC-compatible database.
 
 Documentation for this connector can be found [here](http://docs.confluent.io/current/connect/connect-jdbc/docs/index.html).
 
+# Installation
+1. Edit the Kafka Connect worker properties file on each worker to include a new directory. For example, 
+
+```/opt/kafka-connect/plugins```
+
+  ```plugin.path=/usr/share/java,/opt/kafka-connect/plugins```
+
+2. Build this project
+
+`./mvnw clean package`
+
+3. Copy the JAR from target to all Kafka Connect workers under a directory set by plugin.path
+
+4. (Re)start Kafka Connect processes
+
 # Development
 
 To build a development version you'll need a recent version of Kafka as well as a set of upstream Confluent projects, which you'll have to build from their appropriate snapshot branch. See the [FAQ](https://github.com/confluentinc/kafka-connect-jdbc/wiki/FAQ)
