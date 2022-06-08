@@ -10,15 +10,26 @@ Documentation for this connector can be found [here](http://docs.confluent.io/cu
 
 ```/opt/kafka-connect/plugins```
 
-  ```plugin.path=/usr/share/java,/opt/kafka-connect/plugins```
+  ```
+  plugin.path=/usr/share/java,/opt/kafka-connect/plugins
+  ```
 
 2. Build this project
 
-`./mvnw clean package`
+```
+./mvnw clean package
+```
 
 3. Copy the JAR from target to all Kafka Connect workers under a directory set by plugin.path
 
 4. (Re)start Kafka Connect processes
+
+# Usage
+
+Distributed Kafka Connect configuration section
+```
+```
+
 
 # Development
 
