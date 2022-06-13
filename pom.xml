@@ -296,6 +296,18 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+               </plugin>
+            <plugin>
                 <groupId>io.confluent</groupId>
                 <version>${kafka.connect.maven.plugin.version}</version>
                 <artifactId>kafka-connect-maven-plugin</artifactId>
@@ -424,6 +436,7 @@
                         <id>validate</id>
                         <phase>validate</phase>
                         <configuration>
+                            <skip>true</skip>
                             <suppressionsLocation>checkstyle/suppressions.xml</suppressionsLocation>
                         </configuration>
                         <goals>

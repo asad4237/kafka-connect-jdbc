@@ -556,15 +556,15 @@ public class JdbcSinkConfig extends AbstractConfig {
 
     public final boolean customJsonEnabled;
     public final String customJSONSchema;
-    public final boolean schemasEnabled;
+    //public final boolean schemasEnabled;
 
   public JdbcSinkConfig(Map<?, ?> props) {
     super(CONFIG_DEF, props);
 
-    CONFIG_DEF.define(JsonConverterConfig.SCHEMAS_ENABLE_CONFIG, Type.BOOLEAN, JsonConverterConfig.SCHEMAS_ENABLE_DEFAULT , Importance.HIGH, "Include schemas within each of the serialized values and keys.", "Enable Schemas",
-    0, Width.MEDIUM, "Enable Schemas");
+    //CONFIG_DEF.define(JsonConverterConfig.SCHEMAS_ENABLE_CONFIG, Type.BOOLEAN, JsonConverterConfig.SCHEMAS_ENABLE_DEFAULT , Importance.HIGH, "Include schemas within each of the serialized values and keys.", "Enable Schemas",
+    //0, Width.MEDIUM, "Enable Schemas");
     
-    this.schemasEnabled = getBoolean(JsonConverterConfig.SCHEMAS_ENABLE_CONFIG);
+    //this.schemasEnabled = getBoolean(JsonConverterConfig.SCHEMAS_ENABLE_CONFIG);
     connectorName = ConfigUtils.connectorName(props);
     customJsonEnabled = getBoolean(CUSTOM_JSON);
     customJSONSchema = getString(CUSTOM_JSON_SCHEMA);

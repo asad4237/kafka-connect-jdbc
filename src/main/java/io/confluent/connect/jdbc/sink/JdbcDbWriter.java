@@ -22,12 +22,18 @@ import org.apache.kafka.connect.storage.ConverterType;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
+import java.util.Map.Entry;
 
 import javax.lang.model.util.ElementScanner6;
 import javax.ws.rs.NotFoundException;
@@ -45,6 +51,9 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+
+import org.apache.kafka.common.protocol.types.Field.Bool;
+import org.apache.kafka.connect.data.Timestamp;
 
 //import static org.apache.kafka.connect.runtime.ConnectorConfig.CONNECTOR_CLASS_CONFIG;
 //import static org.apache.kafka.connect.runtime.ConnectorConfig.KEY_CONVERTER_CLASS_CONFIG;
@@ -131,7 +140,7 @@ public class JdbcDbWriter {
       map.put(ConverterConfig.TYPE_CONFIG, ConverterType.VALUE.getName());
       map.put(JsonConverterConfig.SCHEMAS_ENABLE_CONFIG, "true");
       converter.configure(map);
-
+      final JsonNodeFactory JSON_NODE_FACTORY = JsonNodeFactory.withExactBigDecimals(true);
       final ObjectWriter writer = objectMapper.writer();
 
       
@@ -184,7 +193,54 @@ public class JdbcDbWriter {
             Schema schema = inferSchema(record.topic(), jsonNode);
             jsonSchema = converter.asJsonSchema(schema);
             log.debug("Schema is not provided or was invalid so inferring schema from the data: " + jsonSchema.toPrettyString());
+            throw new Exception("Schema is missing or invalid so inferring schema from the data: " + jsonSchema.toPrettyString());
           }
+          for( JsonNode  field: jsonSchema.get("fields"))
+          {
+            String type = field.get("type").asText();
+            Boolean optional = field.get("optional").asBoolean();
+            String fieldName  =field.get("field").asText();
+            String name = "";
+            JsonNode nameNode = field.get("name");
+            JsonNode defaultValueNode = field.get("default");
+            if(defaultValueNode != null && !defaultValueNode.isNull() && "autoguid".equals(defaultValueNode.asText()))
+            {
+              //JsonNode fNode = jsonNode.get(fieldName);
+              //if(fNode != null && !fNode.isNull())
+              //{
+                String newGuid = UUID.randomUUID().toString();
+                ((ObjectNode)jsonNode).put(fieldName, newGuid);
+              //}
+              
+            }
+            if(nameNode != null && !nameNode.isNull())
+            {
+              name = nameNode.asText();
+            }
+            
+            if(Timestamp.LOGICAL_NAME.equals(name))
+            {
+              JsonNode fNode = jsonNode.get(fieldName);
+              if(fNode != null && !fNode.isNull())
+              {
+                DateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                Date datetime = df1.parse(fNode.asText());
+                //long longDate = Timestamp.fromLogical((Schema)field,datetime);
+                
+                ((ObjectNode)jsonNode).put(fieldName, datetime.getTime());
+                
+              }
+            }
+          }
+          //Iterator<Entry<String,JsonNode>> fields = jsonSchema.fields();
+          //while(fields.hasNext())
+          //{
+          //  Entry<String,JsonNode> field = fields.next();
+          //  log.debug(field.getValue().getNodeType().name());
+            
+
+          //}
+
 
           ObjectNode jsonWithSchemaEnvelope = JSON_NODE_FACTORY.objectNode();
           jsonWithSchemaEnvelope.set("schema", jsonSchema);
@@ -213,7 +269,7 @@ public class JdbcDbWriter {
       }
     } catch (Exception ex) {
       log.error("Exception: error while processing received json: {}", record.value(), ex);
-      throw new ConnectException(String.format("Exception: error while processing received json: {}", record.value()), ex);
+      throw new ConnectException(String.format("Exception: error while processing received json: %s", record.value()), ex);
     }
   }
   void write(final Collection<SinkRecord> records)
@@ -230,10 +286,10 @@ public class JdbcDbWriter {
         }
 
         if (config.customJsonEnabled) {
-          if(config.customJsonEnabled && config.schemasEnabled)
-          {
-            throw new ConnectException("Make a careful choice, schema registry and custom schema both cannot be enabled at a time");
-          }
+          //if(config.customJsonEnabled && config.schemasEnabled)
+          //{
+            //throw new ConnectException("Make a careful choice, schema registry and custom schema both cannot be enabled at a time");
+          //}
           HandleCustomSchema(record,buffer);
         } else {
           buffer.add(record);

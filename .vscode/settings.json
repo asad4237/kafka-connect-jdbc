@@ -1,3 +1,9 @@
 {
-    "java.configuration.updateBuildConfiguration": "automatic"
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx4G -Xms100m",
+    "java.project.exportJar.targetPath": "/usr/local/share/kafka/plugins/confluentinc-kafka-connect-jdbc-10.4.1/lib/${workspaceFolderBasename}.jar",
+    //"java.jdt.ls.java.home": "/usr/lib/jvm/java-8-openjdk-amd64",
+    "java.jdt.ls.java.home": "/usr/lib/jvm/temurin-17-jdk-amd64",
+    
+    "java.import.maven.enabled": true,
 }
