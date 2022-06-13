@@ -18,6 +18,8 @@ Documentation for this connector can be found [here](http://docs.confluent.io/cu
 
 ```
 ./mvnw clean package
+
+or copy the jar file from the root of this repo master/confluentinc-kafka-connect-jdbc-10.4.1.zip
 ```
 
 3. Copy the JAR from target to all Kafka Connect workers under a directory set by plugin.path
