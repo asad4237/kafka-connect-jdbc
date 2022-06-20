@@ -8,6 +8,8 @@ Documentation for this connector can be found [here](http://docs.confluent.io/cu
 # Installation
 1. Edit the Kafka Connect worker properties file on each worker to include a new directory. For example, 
 
+gedit /etc/kafka/connect-distributed.roc.properties
+
 ```/opt/kafka-connect/plugins```
 
   ```
