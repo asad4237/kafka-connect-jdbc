@@ -64,6 +64,9 @@ public class JdbcSourceConnectorConfig extends AbstractConfig {
   public static final String CUSTOM_PREFIX = "custom.";
   public static final String CUSTOM_JSON_CONFIG = CUSTOM_PREFIX + "json.schema.enabled";
   public static final String CUSTOM_JSON_SCHEMA_CONFIG = CUSTOM_PREFIX + "json.schema";
+  public static final String CUSTOM_JSON_DATETIMEFORMAT_CONFIG = CUSTOM_PREFIX + "json.datetimeformat";
+
+  
   
 
   public static final String CONNECTION_PREFIX = "connection.";

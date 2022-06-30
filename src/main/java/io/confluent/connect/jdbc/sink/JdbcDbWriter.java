@@ -23,6 +23,7 @@ import org.apache.kafka.connect.storage.ConverterType;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.Map.Entry;
 
@@ -140,7 +142,6 @@ public class JdbcDbWriter {
       map.put(ConverterConfig.TYPE_CONFIG, ConverterType.VALUE.getName());
       map.put(JsonConverterConfig.SCHEMAS_ENABLE_CONFIG, "true");
       converter.configure(map);
-      final JsonNodeFactory JSON_NODE_FACTORY = JsonNodeFactory.withExactBigDecimals(true);
       final ObjectWriter writer = objectMapper.writer();
 
       
@@ -197,8 +198,8 @@ public class JdbcDbWriter {
           }
           for( JsonNode  field: jsonSchema.get("fields"))
           {
-            String type = field.get("type").asText();
-            Boolean optional = field.get("optional").asBoolean();
+            //String type = field.get("type").asText();
+            //Boolean optional = field.get("optional").asBoolean();
             String fieldName  =field.get("field").asText();
             String name = "";
             JsonNode nameNode = field.get("name");
@@ -223,7 +224,10 @@ public class JdbcDbWriter {
               JsonNode fNode = jsonNode.get(fieldName);
               if(fNode != null && !fNode.isNull())
               {
-                DateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                //DateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                DateFormat df1 = new SimpleDateFormat(config.customJsonDatetimeFormat);
+                
+                df1.setTimeZone(TimeZone.getTimeZone("GMT"));
                 Date datetime = df1.parse(fNode.asText());
                 //long longDate = Timestamp.fromLogical((Schema)field,datetime);
                 
@@ -267,9 +271,19 @@ public class JdbcDbWriter {
         // Use the writer for thread safe access.
 
       }
-    } catch (Exception ex) {
+    } 
+    catch (ParseException ex)
+    {
+      String s = record.value().toString();
+      s = s.substring(0, Math.min(s.length(), 2000));
       log.error("Exception: error while processing received json: {}", record.value(), ex);
-      throw new ConnectException(String.format("Exception: error while processing received json: %s", record.value()), ex);
+      throw new ConnectException(String.format("Exception: error while processing received json: %s, custom.json.datetimeformat: %s", s,config.customJsonDatetimeFormat), ex);
+    }
+    catch (Exception ex) {
+      String s = record.value().toString();
+      s = s.substring(0, Math.min(s.length(), 2000));
+      log.error("Exception: error while processing received json: {}", record.value(), ex);
+      throw new ConnectException(String.format("Exception: error while processing received json: %s", s), ex);
     }
   }
   void write(final Collection<SinkRecord> records)

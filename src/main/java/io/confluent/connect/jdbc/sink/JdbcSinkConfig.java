@@ -76,6 +76,11 @@ public class JdbcSinkConfig extends AbstractConfig {
   private static final String CUSTOM_JSON_DEFAULT = "false";
   private static final String CUSTOM_JSON_DOC = "Custom JSON paring enabled?";
   private static final String CUSTOM_JSON_DISPLAY = "Custom JSON paring enabled?";
+  
+  public static final String CUSTOM_JSON_DATETIMEFORMAT = JdbcSourceConnectorConfig.CUSTOM_JSON_DATETIMEFORMAT_CONFIG;
+  private static final String CUSTOM_JSON_DATETIMEFORMAT_DEFAULT  = "yyyy-MM-dd'T'HH:mm:ss";
+  private static final String CUSTOM_JSON_DATETIMEFORMAT_DOC = "Custom json date time format";
+  private static final String CUSTOM_JSON_DATETIMEFORMAT_DISPLAY = "Custom json date time format";
 
   public static final String CUSTOM_JSON_SCHEMA = JdbcSourceConnectorConfig.CUSTOM_JSON_SCHEMA_CONFIG;
   private static final String CUSTOM_JSON_SCHEMA_DEFAULT  = "";
@@ -278,6 +283,17 @@ public class JdbcSinkConfig extends AbstractConfig {
       EnumRecommender.in(TableType.values());
 
   public static final ConfigDef CONFIG_DEF = new ConfigDef()
+  //Custom Json datetime format
+  .define(
+            CUSTOM_JSON_DATETIMEFORMAT,
+            ConfigDef.Type.STRING,
+            CUSTOM_JSON_DATETIMEFORMAT_DEFAULT,
+            ConfigDef.Importance.MEDIUM,
+            CUSTOM_JSON_DATETIMEFORMAT_DOC, DATAMAPPING_GROUP,
+            6,
+            ConfigDef.Width.LONG,
+            CUSTOM_JSON_DATETIMEFORMAT_DISPLAY
+        )  
   //Custom Json Schema
   .define(
             CUSTOM_JSON,
@@ -285,7 +301,7 @@ public class JdbcSinkConfig extends AbstractConfig {
             CUSTOM_JSON_DEFAULT,
             ConfigDef.Importance.MEDIUM,
             CUSTOM_JSON_DOC, DATAMAPPING_GROUP,
-            6,
+            7,
             ConfigDef.Width.SHORT,
             CUSTOM_JSON_DISPLAY
         )   
@@ -296,7 +312,7 @@ public class JdbcSinkConfig extends AbstractConfig {
     CUSTOM_JSON_SCHEMA_DEFAULT,
     ConfigDef.Importance.MEDIUM,
     CUSTOM_JSON_SCHEMA_DOC, DATAMAPPING_GROUP,
-    6,
+    8,
     ConfigDef.Width.LONG,
     CUSTOM_JSON_SCHEMA_DISPLAY
 )   
@@ -555,6 +571,7 @@ public class JdbcSinkConfig extends AbstractConfig {
 
 
     public final boolean customJsonEnabled;
+    public final String customJsonDatetimeFormat;
     public final String customJSONSchema;
     //public final boolean schemasEnabled;
 
@@ -567,6 +584,7 @@ public class JdbcSinkConfig extends AbstractConfig {
     //this.schemasEnabled = getBoolean(JsonConverterConfig.SCHEMAS_ENABLE_CONFIG);
     connectorName = ConfigUtils.connectorName(props);
     customJsonEnabled = getBoolean(CUSTOM_JSON);
+    customJsonDatetimeFormat = getString(CUSTOM_JSON_DATETIMEFORMAT);
     customJSONSchema = getString(CUSTOM_JSON_SCHEMA);
     connectionUrl = getString(CONNECTION_URL);
     connectionUser = getString(CONNECTION_USER);
